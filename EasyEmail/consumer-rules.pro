@@ -1,3 +1,3 @@
 # EasyEmail consumer rules
--keep class com.yourname.easyemail.** { *; }
--dontwarn com.yourname.easyemail.**
+-keep class com.melikash98.easyemail.** { *; }
+-dontwarn com.melikash98.easyemail.**
