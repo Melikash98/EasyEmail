@@ -2,17 +2,14 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
 }
-group = 'com.github.melikash98'
+group = 'com.github.Melikash98'
 version = '1.0.0'
 android {
     namespace 'com.melikash98.easyemail'
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk 35
 
     defaultConfig {
         minSdk 24
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -23,8 +20,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     publishing {
         singleVariant('release') {
@@ -32,15 +29,11 @@ android {
             withJavadocJar()
         }
     }
-
 }
 
 dependencies {
     implementation libs.appcompat
     implementation libs.material
-    testImplementation libs.junit
-    androidTestImplementation libs.espresso.core
-    androidTestImplementation libs.ext.junit
 
     implementation platform('com.google.firebase:firebase-bom:34.13.0')
     implementation 'com.google.firebase:firebase-database'
@@ -49,17 +42,16 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor'
     implementation 'com.sun.mail:android-mail:1.6.8'
     implementation 'com.sun.mail:android-activation:1.6.8'
-
 }
+
 afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
                 from components.release
-
-                groupId = 'com.github.melikash98'
-                artifactId = 'easyemail'
-                version = '1.0.0'
+                groupId = 'com.github.Melikash98'
+                artifactId = 'EasyEmail'
+                version = '1.0.1'
             }
         }
     }
