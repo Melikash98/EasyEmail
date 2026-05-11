@@ -59,7 +59,7 @@ afterEvaluate {
 
                 groupId = 'com.github.melikash98'
                 artifactId = 'easyemail'
-                version = '1.00'
+                version = '1.0.0'
             }
         }
     }
