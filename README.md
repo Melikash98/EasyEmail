@@ -76,13 +76,13 @@ dependencies {
     implementation 'com.sun.mail:android-mail:1.6.7'
     implementation 'com.sun.mail:android-activation:1.6.7'
 
+    // Offline queue (WorkManager + Room)
+    implementation 'androidx.work:work-runtime:2.9.0'
+    implementation 'androidx.room:room-runtime:2.6.1'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
+
     // Firebase (only if firebaseEnabled = true)
     implementation 'com.google.firebase:firebase-database:21.0.0'
-
-   // WorkManager And Room
-   implementation 'androidx.work:work-runtime:2.x.x'
-   implementation 'androidx.room:room-runtime:2.x.x'
-   annotationProcessor 'androidx.room:room-compiler:2.x.x'
 }
 ```
 ---
@@ -328,6 +328,32 @@ easyEmail.fetchOwnerReplies(
 
 ---
 
+### 4. Observing Email State (LiveData)
+
+You can observe the send state anywhere in your app:
+
+```java
+EmailStateLiveData.getInstance().getLiveData().observe(this, state -> {
+    switch (state.getStatus()) {
+        case LOADING:
+            // Show progress indicator
+            break;
+        case QUEUED:
+            // Email is queued (offline)
+            Toast.makeText(this, state.getMessage(), Toast.LENGTH_SHORT).show();
+            break;
+        case SUCCESS:
+            // Email sent successfully
+            break;
+        case FAILED:
+            // Send failed after retries
+            Log.e("EasyEmail", state.getMessage());
+            break;
+    }
+});
+```
+---
+
 ## 🔥 Firebase Data Structure
 When `firebaseEnabled = true`, the library writes to Firebase Realtime Database using the following structure:
 
@@ -369,6 +395,24 @@ When `firebaseEnabled = true`, the library writes to Firebase Realtime Database 
         └── (same fields as user inquiry node)
 ```
 
+###  Disable Firebase
+
+```java
+new EmailJsConfig.Builder()
+        ...
+        .setFirebaseEnabled(false)
+        .build();
+```
+---
+###  Custom Firebase Roots
+
+```java
+new EmailJsConfig.Builder()
+        ...
+        .setFirebaseInquiryRoot("Inquiries")   // default: "Emails"
+        .setFirebaseUserRoot("AppUsers")        // default: "Users"
+        .build();
+```
 ---
 
 ##  Known Limitations
