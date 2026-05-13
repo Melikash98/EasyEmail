@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_logo.png" alt="Logo" width="500px"   height="250px" style="margin-right: 10px;padding-top: 6rem;" />
+<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_logo.png" alt="Logo" width="500px" height="250px" style="margin-right: 10px;padding-top: 6rem;" />
 
 # EasyEmail
 
@@ -11,19 +11,21 @@
 
 EasyEmail handles the full email workflow in Android apps: sending contact/inquiry emails, owner replies, fetching replies from an IMAP inbox, and storing everything in Firebase — all with a single fluent API.
 
->  **EmailJS Only** — This library exclusively supports [EmailJS](https://www.emailjs.com/) as the email delivery provider. SMTP or other providers are not supported.
+> **EmailJS Only** — This library exclusively supports [EmailJS](https://www.emailjs.com/) as the email delivery provider. SMTP or other providers are not supported.
 
 ---
 
-##  Features
+## Features
 
 - **Send inquiry emails** via EmailJS with one method call
 - **Send reply emails** back to users via EmailJS
 - **Fetch owner replies** from any IMAP inbox (e.g. Gmail)
+- **Offline queue** — emails are queued locally using WorkManager + Room and sent automatically when connectivity is restored
 - **Firebase Realtime Database** integration — auto-save inquiries, replies, and notifications
 - **Unread reply count** management in Firebase
 - **Customizable templates** via `defaultInquiryParams` / `defaultReplyParams`
 - **Extra params** support for flexible EmailJS template variables
+- **LiveData state** — observe send progress (`LOADING`, `QUEUED`, `SUCCESS`, `FAILED`) anywhere in your app
 - **Callbacks on the main thread** — safe to update UI directly in `onSuccess` / `onError`
 - **Builder pattern** config — clean, readable setup with sensible defaults
 - Works with both **Kotlin and Java** projects
@@ -31,42 +33,48 @@ EasyEmail handles the full email workflow in Android apps: sending contact/inqui
 
 ---
 
-##  Demo
+## Demo
 
-<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="25%"   height="25%" style="margin-right: 10px;padding-top: 6rem;" />
+<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="25%" height="25%" style="margin-right: 10px;padding-top: 6rem;" />
 
 ---
 
-##  Installation
+## Installation
 
-### 1. Add JitPack repository
+### Step 1: Add JitPack repository
 
 In your **root** `settings.gradle` (or `settings.gradle.kts`):
 
 ```gradle
 dependencyResolutionManagement {
-		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-		repositories {
-			mavenCentral()
-			maven { url 'https://jitpack.io' }
-		}
-	}
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
 ```
+
 ### Step 2: Add dependency
 
 ```gradle
 dependencies {
-	        implementation 'com.github.Melikash98:EasyEmail:v1.0.2'
-	}
+    implementation 'com.github.Melikash98:EasyEmail:v1.0.2'
+}
 ```
+
 ### Step 3: Add required permissions
+
 In your `AndroidManifest.xml`:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 ```
-### Step 4: Required Dependencies
+
+### Step 4: Required dependencies
+
 The library requires the following in your app's `build.gradle`. If you're using JitPack, these are pulled in automatically unless excluded:
+
 ```groovy
 dependencies {
     // HTTP client for EmailJS
@@ -85,8 +93,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:21.0.0'
 }
 ```
+
 ---
-##  EmailJS Setup
+
+## EmailJS Setup
+
 EasyEmail **only works with EmailJS**. You must create a free account and configure your templates before using this library.
 
 ### 1. Create an EmailJS account
@@ -102,40 +113,42 @@ In your EmailJS dashboard, go to **Email Services** → **Add New Service** and 
 Go to **Email Templates** → **Create New Template**.
 
 This template is used when a user sends an inquiry. The following variables are automatically filled by the library — add any of them to your template:
-| Variable            | Description                          |
-|---------------------|--------------------------------------|
-| `{{name}}`          | User's display name                  |
-| `{{user_name}}`     | User's display name (alias)          |
-| `{{user_email}}`    | User's email address                 |
-| `{{user_phone}}`    | User's phone number                  |
-| `{{message}}`       | Inquiry message body                 |
-| `{{term}}`          | Term/condition field                 |
-| `{{time}}`          | Formatted send time (dd/MM/yyyy HH:mm) |
-| `{{owner_email}}`   | Receiver's (owner's) email           |
-| `{{owner_name}}`    | Receiver's (owner's) name            |
-| `{{owner_photo_url}}`| Receiver's photo URL                |
-| `{{app_email}}`     | Your app's email (from config)       |
-| `{{item_id}}`       | Item/listing ID                      |
-| `{{categories_id}}` | Category ID                          |
-| `{{inquiry_id}}`    | Auto-generated unique inquiry UUID   |
+
+| Variable              | Description                              |
+|-----------------------|------------------------------------------|
+| `{{name}}`            | User's display name                      |
+| `{{user_name}}`       | User's display name (alias)              |
+| `{{user_email}}`      | User's email address                     |
+| `{{user_phone}}`      | User's phone number                      |
+| `{{message}}`         | Inquiry message body                     |
+| `{{term}}`            | Term/condition field                     |
+| `{{time}}`            | Formatted send time (dd/MM/yyyy HH:mm)   |
+| `{{owner_email}}`     | Receiver's (owner's) email               |
+| `{{owner_name}}`      | Receiver's (owner's) name                |
+| `{{owner_photo_url}}` | Receiver's photo URL                     |
+| `{{app_email}}`       | Your app's email (from config)           |
+| `{{item_id}}`         | Item/listing ID                          |
+| `{{categories_id}}`   | Category ID                              |
+| `{{inquiry_id}}`      | Auto-generated unique inquiry UUID       |
 
 Copy the **Template ID** (e.g. `template_xxxxxxx`).
+
 ### 4. Create a Reply Template
 
 Create a second template for owner replies. Variables available:
 
-| Variable             | Description                        |
-|----------------------|------------------------------------|
-| `{{owner_email}}`    | Owner's email address              |
-| `{{owner_name}}`     | Owner's display name               |
-| `{{reply_message}}`  | The reply message body             |
-| `{{user_name}}`      | User being replied to              |
-| `{{name}}`           | User being replied to (alias)      |
-| `{{user_photo_url}}` | User's photo URL                   |
-| `{{item_id}}`        | Item/listing ID                    |
-| `{{inquiry_id}}`     | The original inquiry UUID          |
-| `{{time}}`           | Formatted reply time               |
-| `{{app_email}}`      | Your app's email (from config)     |
+| Variable              | Description                          |
+|-----------------------|--------------------------------------|
+| `{{owner_email}}`     | Owner's email address                |
+| `{{owner_name}}`      | Owner's display name                 |
+| `{{reply_message}}`   | The reply message body               |
+| `{{user_name}}`       | User being replied to                |
+| `{{name}}`            | User being replied to (alias)        |
+| `{{user_photo_url}}`  | User's photo URL                     |
+| `{{item_id}}`         | Item/listing ID                      |
+| `{{inquiry_id}}`      | The original inquiry UUID            |
+| `{{time}}`            | Formatted reply time                 |
+| `{{app_email}}`       | Your app's email (from config)       |
 
 > **Important:** For IMAP reply fetching to work, your reply template **must include `{{inquiry_id}}`** somewhere in the email **Subject** line, so the library can match incoming emails to the correct inquiry.
 
@@ -158,9 +171,10 @@ EmailJsConfig config = new EmailJsConfig.Builder()
     .setAppPassword("your_app_password")
     .build();
 ```
+
 ---
 
-##  Configuration — `EmailJsConfig`
+## Configuration — `EmailJsConfig`
 
 All configuration is done via the `Builder`. Most fields have sensible defaults.
 
@@ -168,32 +182,32 @@ All configuration is done via the `Builder`. Most fields have sensible defaults.
 EmailJsConfig config = new EmailJsConfig.Builder()
 
     // ── Required for sending ──────────────────────────────────────
-    .setServiceId("service_xxxxxxx")          // EmailJS Service ID
-    .setPublicKey("your_public_key")          // EmailJS Public Key
-    .setInquiryTemplateId("template_xxxxxxx") // Template ID for inquiries
+    .setServiceId("service_xxxxxxx")           // EmailJS Service ID
+    .setPublicKey("your_public_key")           // EmailJS Public Key
+    .setInquiryTemplateId("template_xxxxxxx")  // Template ID for inquiries
 
     // ── Required for replies ──────────────────────────────────────
-    .setReplyTemplateId("template_yyyyyyy")   // Template ID for replies
+    .setReplyTemplateId("template_yyyyyyy")    // Template ID for replies
 
     // ── Required for IMAP fetching ────────────────────────────────
-    .setAppEmail("your.app@gmail.com")        // IMAP login email
-    .setAppPassword("xxxx xxxx xxxx xxxx")    // App password (NOT your real password)
-    .setImapHost("imap.gmail.com")            // Default: "imap.gmail.com"
-    .setImapPort(993)                         // Default: 993
+    .setAppEmail("your.app@gmail.com")         // IMAP login email
+    .setAppPassword("xxxx xxxx xxxx xxxx")     // App password (NOT your real password)
+    .setImapHost("imap.gmail.com")             // Default: "imap.gmail.com"
+    .setImapPort(993)                          // Default: 993
 
     // ── Firebase (optional) ───────────────────────────────────────
-    .setFirebaseEnabled(true)                 // Default: true
-    .setFirebaseInquiryRoot("Emails")         // Root node for inquiries. Default: "Emails"
-    .setFirebaseUserRoot("Users")             // Root node for users. Default: "Users"
+    .setFirebaseEnabled(true)                  // Default: true
+    .setFirebaseInquiryRoot("Emails")          // Root node for inquiries. Default: "Emails"
+    .setFirebaseUserRoot("Users")              // Root node for users. Default: "Users"
 
     // ── Notifications (optional) ──────────────────────────────────
-    .setNotificationsEnabled(true)            // Default: true
-    .setNotificationTitle("New Reply")        // Default: "New Reply"
+    .setNotificationsEnabled(true)             // Default: true
+    .setNotificationTitle("New Reply")         // Default: "New Reply"
     .setNotificationBody("You have received a new reply.") // Default value
 
     // ── Custom default template params (optional) ─────────────────
-    .setDefaultInquiryParams(myInquiryMap)    // Extra fixed params for inquiry template
-    .setDefaultReplyParams(myReplyMap)        // Extra fixed params for reply template
+    .setDefaultInquiryParams(myInquiryMap)     // Extra fixed params for inquiry template
+    .setDefaultReplyParams(myReplyMap)         // Extra fixed params for reply template
 
     // ── Advanced (optional) ───────────────────────────────────────
     .setEmailJsApiUrl("https://api.emailjs.com/api/v1.0/email/send") // Default value
@@ -203,15 +217,20 @@ EmailJsConfig config = new EmailJsConfig.Builder()
 
 > **Gmail IMAP note:** Google no longer allows sign-in with your normal password from third-party apps. You must generate an **App Password** from your Google Account → Security → 2-Step Verification → App Passwords.
 
+> **Security note:** Never hardcode your `appPassword` or `publicKey` in source files. Use `BuildConfig` fields or an encrypted secrets store (e.g. Android Keystore, encrypted SharedPreferences) and exclude these values from version control.
+
 ---
 
-##  Usage
+## Usage
 
 ### Initialize
+
+It is strongly recommended to create a **single instance** of `EasyEmail` (e.g. via a singleton or dependency injection) rather than creating a new instance per call, to avoid unnecessary resource allocation.
 
 ```java
 EasyEmail easyEmail = new EasyEmail(context, config);
 ```
+
 ---
 
 ### 1. Send an Inquiry
@@ -242,11 +261,16 @@ easyEmail.sendInquiry(
         @Override
         public void onError(String error) {
             // called on main thread
+            // If the device is offline, error will begin with "QUEUED:"
+            // meaning the email has been saved locally and will be sent automatically
+            // when connectivity is restored.
             Log.e("EasyEmail", "Error: " + error);
         }
     }
 );
 ```
+
+> **Offline behaviour:** When the device has no internet connection, the inquiry is saved to a local Room database and `onError` is called with a message prefixed by `"QUEUED:"`. WorkManager will automatically retry sending the email (with exponential backoff, up to 3 attempts) once connectivity is restored. Observe `EmailStateLiveData` for real-time queue status updates.
 
 #### With extra template params
 
@@ -284,6 +308,7 @@ easyEmail.sendReply(
     new EmailCallback() {
         @Override
         public void onSuccess() {
+            // called on main thread — safe to update UI
             Toast.makeText(context, "Reply sent!", Toast.LENGTH_SHORT).show();
         }
 
@@ -309,52 +334,57 @@ easyEmail.fetchOwnerReplies(
     new EmailCallback() {
         @Override
         public void onSuccess() {
-            //  Note: this callback is on a background thread.
-            // Post to the main thread before updating any UI.
-            runOnUiThread(() ->
-                Toast.makeText(context, "Replies fetched!", Toast.LENGTH_SHORT).show()
-            );
+            // called on main thread — safe to update UI directly
+            Toast.makeText(context, "Replies fetched!", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onError(String error) {
-            runOnUiThread(() -> Log.e("EasyEmail", "IMAP error: " + error));
+            Log.e("EasyEmail", "IMAP error: " + error);
         }
     }
 );
 ```
 
->  **Thread notice:** Unlike `sendInquiry` and `sendReply`, the `fetchOwnerReplies` callback is delivered on a **background thread**. Wrap any UI updates inside `runOnUiThread {}` or `Handler(Looper.getMainLooper()).post {}`.
+> **Deduplication warning:** `fetchOwnerReplies` scans the last 50 inbox messages every time it is called. Calling it multiple times for the same inquiry **will save duplicate reply entries** in Firebase. Implement your own call guard (e.g. check the `status` field or existing replies in Firebase before calling) to prevent duplicates.
 
 ---
 
 ### 4. Observing Email State (LiveData)
 
-You can observe the send state anywhere in your app:
+You can observe the send state anywhere in your app. This is the recommended way to show global loading indicators or queue badges:
 
 ```java
 EmailStateLiveData.getInstance().getLiveData().observe(this, state -> {
     switch (state.getStatus()) {
+        case IDLE:
+            // Initial state — nothing to show
+            break;
         case LOADING:
             // Show progress indicator
+            progressBar.setVisibility(View.VISIBLE);
             break;
         case QUEUED:
-            // Email is queued (offline)
+            // Email is queued offline — state.getMessage() contains the queue count
             Toast.makeText(this, state.getMessage(), Toast.LENGTH_SHORT).show();
             break;
         case SUCCESS:
             // Email sent successfully
+            progressBar.setVisibility(View.GONE);
             break;
         case FAILED:
-            // Send failed after retries
+            // Send failed after all retries
+            progressBar.setVisibility(View.GONE);
             Log.e("EasyEmail", state.getMessage());
             break;
     }
 });
 ```
+
 ---
 
-## 🔥 Firebase Data Structure
+## Firebase Data Structure
+
 When `firebaseEnabled = true`, the library writes to Firebase Realtime Database using the following structure:
 
 ```
@@ -395,36 +425,39 @@ When `firebaseEnabled = true`, the library writes to Firebase Realtime Database 
         └── (same fields as user inquiry node)
 ```
 
-###  Disable Firebase
+### Disable Firebase
 
 ```java
 new EmailJsConfig.Builder()
-        ...
-        .setFirebaseEnabled(false)
-        .build();
+    // ...
+    .setFirebaseEnabled(false)
+    .build();
 ```
----
-###  Custom Firebase Roots
+
+### Custom Firebase roots
 
 ```java
 new EmailJsConfig.Builder()
-        ...
-        .setFirebaseInquiryRoot("Inquiries")   // default: "Emails"
-        .setFirebaseUserRoot("AppUsers")        // default: "Users"
-        .build();
+    // ...
+    .setFirebaseInquiryRoot("Inquiries")   // default: "Emails"
+    .setFirebaseUserRoot("AppUsers")       // default: "Users"
+    .build();
 ```
+
 ---
 
-##  Known Limitations
+## Known Limitations
 
 - **EmailJS only** — no SMTP, SendGrid, or other provider support.
-- **IMAP deduplication** — `fetchOwnerReplies` scans the last 50 inbox messages every time it is called. Calling it multiple times for the same inquiry **will save duplicate reply entries** in Firebase. Implement your own call guard (e.g. check `status` in Firebase before fetching) if needed.
+- **IMAP deduplication** — `fetchOwnerReplies` scans the last 50 inbox messages every time it is called. Calling it multiple times for the same inquiry **will save duplicate reply entries** in Firebase. Implement your own call guard before fetching.
 - **OkHttpClient instances** — a new `OkHttpClient` is created per send call. For high-frequency use, consider wrapping `EasyEmail` as a singleton in your app.
 - **App password security** — your IMAP app password is held in memory inside `EmailJsConfig`. Do not log the config object and do not store the password in plain-text source files. Use `BuildConfig` fields or an encrypted store instead.
+- **Database migration** — the internal Room database uses destructive migration. Upgrading the library version may clear any locally queued (unsent) emails. Ensure pending emails are flushed before updating the library.
+- **Offline callback behaviour** — when the device is offline, `onError` is called with a `"QUEUED:"` prefix. This does **not** mean the send failed permanently; the email will be retried automatically by WorkManager.
 
 ---
 
-## 📋 API Reference
+## API Reference
 
 ### `EasyEmail`
 
@@ -444,6 +477,18 @@ public interface EmailCallback {
     void onError(String error);
 }
 ```
+
+> Both `onSuccess` and `onError` are delivered on the **main thread** for all methods, making it safe to update UI directly inside the callbacks.
+
+### `EmailState` statuses
+
+| Status | Meaning |
+|--------|---------|
+| `IDLE` | Initial state, nothing in progress |
+| `LOADING` | Send request is in progress |
+| `QUEUED` | Device is offline; email saved to local queue |
+| `SUCCESS` | Email was sent successfully |
+| `FAILED` | All retry attempts exhausted |
 
 ### `EmailJsConfig.Builder` — all fields
 
@@ -469,15 +514,18 @@ public interface EmailCallback {
 
 ---
 
-##  License
+## License
+
 This project is licensed under the MIT License.
 
 ---
+
 ## Keywords
 
-android email library, emailjs android, android inquiry email,android imap library, firebase email android, android contact form library,send email android java
+android email library, emailjs android, android inquiry email, android imap library, firebase email android, android contact form library, send email android java
 
 ---
+
 ## 👨‍💻 Author
 
 **Melikash98**
@@ -487,5 +535,3 @@ it helps the project grow and motivates further development.
 
 For feature requests, bug reports, or suggestions, please open an issue.
 Your feedback is highly appreciated.
-
-
