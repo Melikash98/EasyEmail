@@ -1,4 +1,6 @@
-package com.melikash98.easyemail;
+package com.melikash98.easyemail.Config;
+
+import com.melikash98.easyemail.EasyEmail;
 
 import java.util.Collections;
 import java.util.HashMap;

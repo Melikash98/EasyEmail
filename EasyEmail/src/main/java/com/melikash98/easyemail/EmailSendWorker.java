@@ -7,6 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.melikash98.easyemail.Config.EmailJsConfig;
+import com.melikash98.easyemail.Config.EmailJsConfigSerializer;
+
 import org.json.JSONObject;
 
 import java.util.List;

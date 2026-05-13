@@ -14,6 +14,8 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.melikash98.easyemail.Config.EmailJsConfig;
+
 import org.json.JSONObject;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class EmailQueueManager {
     private static final String WORK_TAG = "easy_email_send";
 
     private final Context        context;
-    private final EmailJsConfig  config;
+    private final EmailJsConfig config;
     private final PendingEmailDao dao;
 
     public EmailQueueManager(Context context, EmailJsConfig config) {

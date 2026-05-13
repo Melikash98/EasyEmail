@@ -1,5 +1,8 @@
 package com.melikash98.easyemail;
 
+import com.melikash98.easyemail.Config.EmailJsConfig;
+import com.melikash98.easyemail.Config.EmailJsConfigSerializer;
+
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
