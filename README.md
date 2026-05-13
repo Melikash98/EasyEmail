@@ -2,35 +2,38 @@
 
 # EasyEmail
 
-[![](https://jitpack.io/v/Melikash98/Editify.svg)](https://jitpack.io/#Melikash98/Editify)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![JitPack](https://jitpack.io/v/Melikash98/EasyEmail.svg)](https://jitpack.io/#Melikash98/EasyEmail)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Melikash98/EasyEmail/blob/main/LICENSE)
+[![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg)](https://android-arsenal.com/api?level=21)
+[![Platform](https://img.shields.io/badge/platform-Android-orange.svg)](https://developer.android.com)
 
-**A beautiful and lightweight Material-style EditText library with smooth floating hint animation.**
+**EasyEmail — A lightweight Android library for sending inquiries and replies via EmailJS, with optional Firebase Realtime Database integration and IMAP inbox fetching.**
 
+EasyEmail handles the full email workflow in Android apps: sending contact/inquiry emails, owner replies, fetching replies from an IMAP inbox, and storing everything in Firebase — all with a single fluent API.
 
-**A beautiful, fully customizable, animated Android input field library with floating hint, password toggle, helper/warning/error messages, RTL support, and smooth animations.**
-
-Editify provides a modern `CustomInputEdit` component that replaces the default `EditText` with advanced UX features commonly seen in premium apps.
+> ⚠️ **EmailJS Only** — This library exclusively supports [EmailJS](https://www.emailjs.com/) as the email delivery provider. SMTP or other providers are not supported.
 
 ---
 
-## ✨ Features
+##  Features
 
-- **Floating hint animation** with scale and color transition
-- **Password visibility toggle** (show/hide with custom icons)
-- **Helper, Warning & Error states** with optional icons and colors
-- **Full RTL support** (`rightDirection` attribute)
-- **Highly customizable** colors, fonts, sizes, backgrounds, and icons
-- **Smooth animations** using Android's `ObjectAnimator` and `ValueAnimator`
-- **Works with both Kotlin and Java** projects
-- **Zero dependencies** – pure AndroidX + ConstraintLayout
+- **Send inquiry emails** via EmailJS with one method call
+- **Send reply emails** back to users via EmailJS
+- **Fetch owner replies** from any IMAP inbox (e.g. Gmail)
+- **Firebase Realtime Database** integration — auto-save inquiries, replies, and notifications
+- **Unread reply count** management in Firebase
+- **Customizable templates** via `defaultInquiryParams` / `defaultReplyParams`
+- **Extra params** support for flexible EmailJS template variables
+- **Callbacks on the main thread** — safe to update UI directly in `onSuccess` / `onError`
+- **Builder pattern** config — clean, readable setup with sensible defaults
+- Works with both **Kotlin and Java** projects
 - **JitPack ready** for instant integration
 
 ---
 
 ##  Demo
 
-<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="35%"   height="35%" style="margin-right: 10px;padding-top: 6rem;" />
+<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="25%"   height="25%" style="margin-right: 10px;padding-top: 6rem;" />
 
 ---
 
@@ -53,9 +56,30 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-	             implementation 'com.github.Melikash98:Editify:v1.7.0'
+	        implementation 'com.github.Melikash98:EasyEmail:v1.0.2'
 	}
 ```
+### Step 3: Add required permissions
+In your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+### Step 4: Required Dependencies
+The library requires the following in your app's `build.gradle`. If you're using JitPack, these are pulled in automatically unless excluded:
+```groovy
+dependencies {
+    // HTTP client for EmailJS
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // IMAP fetching
+    implementation 'com.sun.mail:android-mail:1.6.7'
+    implementation 'com.sun.mail:android-activation:1.6.7'
+
+    // Firebase (only if firebaseEnabled = true)
+    implementation 'com.google.firebase:firebase-database:21.0.0'
+}
+
 ##  Usage
 
 ### XML
