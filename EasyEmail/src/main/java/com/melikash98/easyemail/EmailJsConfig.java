@@ -1,5 +1,9 @@
 package com.melikash98.easyemail;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class EmailJsConfig {
     private final String serviceId;
     private final String publicKey;
@@ -20,6 +24,9 @@ public class EmailJsConfig {
     private final String notificationTitle;
     private final String notificationBody;
 
+    private final Map<String, String> defaultInquiryParams;
+    private final Map<String, String> defaultReplyParams;
+
     private EmailJsConfig(Builder builder) {
         this.serviceId            = builder.serviceId;
         this.publicKey            = builder.publicKey;
@@ -36,32 +43,41 @@ public class EmailJsConfig {
         this.notificationsEnabled = builder.notificationsEnabled;
         this.notificationTitle    = builder.notificationTitle;
         this.notificationBody     = builder.notificationBody;
+        this.defaultInquiryParams = builder.defaultInquiryParams != null
+                ? Collections.unmodifiableMap(new HashMap<>(builder.defaultInquiryParams))
+                : Collections.emptyMap();
+        this.defaultReplyParams   = builder.defaultReplyParams != null
+                ? Collections.unmodifiableMap(new HashMap<>(builder.defaultReplyParams))
+                : Collections.emptyMap();
     }
-    public String getServiceId()           { return serviceId; }
-    public String getPublicKey()           { return publicKey; }
-    public String getInquiryTemplateId()   { return inquiryTemplateId; }
-    public String getReplyTemplateId()     { return replyTemplateId; }
-    public String getEmailJsApiUrl()       { return emailJsApiUrl; }
-    public String getAppEmail()            { return appEmail; }
-    public String getAppPassword()         { return appPassword; }
-    public String getImapHost()            { return imapHost; }
-    public int    getImapPort()            { return imapPort; }
-    public boolean isFirebaseEnabled()     { return firebaseEnabled; }
-    public String getFirebaseInquiryRoot() { return firebaseInquiryRoot; }
-    public String getFirebaseUserRoot()    { return firebaseUserRoot; }
-    public boolean isNotificationsEnabled(){ return notificationsEnabled; }
-    public String getNotificationTitle()   { return notificationTitle; }
-    public String getNotificationBody()    { return notificationBody; }
+
+    public String getServiceId()                       { return serviceId; }
+    public String getPublicKey()                       { return publicKey; }
+    public String getInquiryTemplateId()               { return inquiryTemplateId; }
+    public String getReplyTemplateId()                 { return replyTemplateId; }
+    public String getEmailJsApiUrl()                   { return emailJsApiUrl; }
+    public String getAppEmail()                        { return appEmail; }
+    public String getAppPassword()                     { return appPassword; }
+    public String getImapHost()                        { return imapHost; }
+    public int    getImapPort()                        { return imapPort; }
+    public boolean isFirebaseEnabled()                 { return firebaseEnabled; }
+    public String getFirebaseInquiryRoot()             { return firebaseInquiryRoot; }
+    public String getFirebaseUserRoot()                { return firebaseUserRoot; }
+    public boolean isNotificationsEnabled()            { return notificationsEnabled; }
+    public String getNotificationTitle()               { return notificationTitle; }
+    public String getNotificationBody()                { return notificationBody; }
+    public Map<String, String> getDefaultInquiryParams() { return defaultInquiryParams; }
+    public Map<String, String> getDefaultReplyParams()   { return defaultReplyParams; }
 
     public void validateForSend() {
-        if (isEmpty(serviceId))          throw new IllegalStateException("serviceId is required.");
-        if (isEmpty(publicKey))          throw new IllegalStateException("publicKey is required.");
-        if (isEmpty(inquiryTemplateId))  throw new IllegalStateException("inquiryTemplateId is required.");
+        if (isEmpty(serviceId))         throw new IllegalStateException("serviceId is required.");
+        if (isEmpty(publicKey))         throw new IllegalStateException("publicKey is required.");
+        if (isEmpty(inquiryTemplateId)) throw new IllegalStateException("inquiryTemplateId is required.");
     }
 
     public void validateForReply() {
         validateForSend();
-        if (isEmpty(replyTemplateId))    throw new IllegalStateException("replyTemplateId is required.");
+        if (isEmpty(replyTemplateId))   throw new IllegalStateException("replyTemplateId is required.");
     }
 
     public void validateForFetch() {
@@ -74,39 +90,48 @@ public class EmailJsConfig {
     private static boolean isEmpty(String s) {
         return s == null || s.trim().isEmpty();
     }
-
     public static class Builder {
         private String serviceId;
         private String publicKey;
         private String inquiryTemplateId;
         private String replyTemplateId;
-        private String emailJsApiUrl      = "https://api.emailjs.com/api/v1.0/email/send";
+        private String emailJsApiUrl         = "https://api.emailjs.com/api/v1.0/email/send";
         private String appEmail;
         private String appPassword;
-        private String imapHost           = "imap.gmail.com";
-        private int    imapPort           = 993;
-        private boolean firebaseEnabled   = true;
-        private String firebaseInquiryRoot = "Emails";
-        private String firebaseUserRoot    = "Users";
+        private String imapHost              = "imap.gmail.com";
+        private int    imapPort              = 993;
+        private boolean firebaseEnabled      = true;
+        private String firebaseInquiryRoot   = "Emails";
+        private String firebaseUserRoot      = "Users";
         private boolean notificationsEnabled = true;
-        private String notificationTitle  = "New Reply";
-        private String notificationBody   = "You have received a new reply.";
+        private String notificationTitle     = "New Reply";
+        private String notificationBody      = "You have received a new reply.";
+        private Map<String, String> defaultInquiryParams;
+        private Map<String, String> defaultReplyParams;
 
-        public Builder setServiceId(String v)           { serviceId = v;            return this; }
-        public Builder setPublicKey(String v)           { publicKey = v;            return this; }
-        public Builder setInquiryTemplateId(String v)   { inquiryTemplateId = v;    return this; }
-        public Builder setReplyTemplateId(String v)     { replyTemplateId = v;      return this; }
-        public Builder setEmailJsApiUrl(String v)       { emailJsApiUrl = v;        return this; }
-        public Builder setAppEmail(String v)            { appEmail = v;             return this; }
-        public Builder setAppPassword(String v)         { appPassword = v;          return this; }
-        public Builder setImapHost(String v)            { imapHost = v;             return this; }
-        public Builder setImapPort(int v)               { imapPort = v;             return this; }
-        public Builder setFirebaseEnabled(boolean v)    { firebaseEnabled = v;      return this; }
-        public Builder setFirebaseInquiryRoot(String v) { firebaseInquiryRoot = v;  return this; }
-        public Builder setFirebaseUserRoot(String v)    { firebaseUserRoot = v;     return this; }
-        public Builder setNotificationsEnabled(boolean v){ notificationsEnabled = v;return this; }
-        public Builder setNotificationTitle(String v)   { notificationTitle = v;    return this; }
-        public Builder setNotificationBody(String v)    { notificationBody = v;     return this; }
+        public Builder setServiceId(String v)            { serviceId = v;             return this; }
+        public Builder setPublicKey(String v)            { publicKey = v;             return this; }
+        public Builder setInquiryTemplateId(String v)    { inquiryTemplateId = v;     return this; }
+        public Builder setReplyTemplateId(String v)      { replyTemplateId = v;       return this; }
+        public Builder setEmailJsApiUrl(String v)        { emailJsApiUrl = v;         return this; }
+        public Builder setAppEmail(String v)             { appEmail = v;              return this; }
+        public Builder setAppPassword(String v)          { appPassword = v;           return this; }
+        public Builder setImapHost(String v)             { imapHost = v;              return this; }
+        public Builder setImapPort(int v)                { imapPort = v;              return this; }
+        public Builder setFirebaseEnabled(boolean v)     { firebaseEnabled = v;       return this; }
+        public Builder setFirebaseInquiryRoot(String v)  { firebaseInquiryRoot = v;   return this; }
+        public Builder setFirebaseUserRoot(String v)     { firebaseUserRoot = v;      return this; }
+        public Builder setNotificationsEnabled(boolean v){ notificationsEnabled = v;  return this; }
+        public Builder setNotificationTitle(String v)    { notificationTitle = v;     return this; }
+        public Builder setNotificationBody(String v)     { notificationBody = v;      return this; }
+        public Builder setDefaultInquiryParams(Map<String, String> v) {
+            defaultInquiryParams = v;
+            return this;
+        }
+        public Builder setDefaultReplyParams(Map<String, String> v) {
+            defaultReplyParams = v;
+            return this;
+        }
 
         public EmailJsConfig build() { return new EmailJsConfig(this); }
     }

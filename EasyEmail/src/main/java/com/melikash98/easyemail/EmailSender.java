@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import okhttp3.Call;
@@ -40,6 +42,7 @@ public class EmailSender {
             String itemId,
             String categoriesId,
             String userUid,
+            @Nullable Map<String, String> extraParams,
             EmailCallback callback
     ) {
         final String inquiryId = UUID.randomUUID().toString();
@@ -51,30 +54,39 @@ public class EmailSender {
                     : new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
 
             JSONObject params = new JSONObject();
-            params.put("name", safe(userName));
-            params.put("user_name", safe(userName));
-            params.put("time", formattedTime);
-            params.put("owner_email", safe(ownerEmail));
-            params.put("owner_name", safe(ownerName));
+            for (Map.Entry<String, String> entry : config.getDefaultInquiryParams().entrySet()) {
+                params.put(entry.getKey(), safe(entry.getValue()));
+            }
+
+            params.put("name",            safe(userName));
+            params.put("user_name",       safe(userName));
+            params.put("time",            formattedTime);
+            params.put("owner_email",     safe(ownerEmail));
+            params.put("owner_name",      safe(ownerName));
             params.put("owner_photo_url", safe(ownerPhotoUrl));
-            params.put("app_email", safe(config.getAppEmail()));
-            params.put("user_email", safe(userEmail));
-            params.put("user_phone", safe(userPhone));
-            params.put("term", safe(term));
-            params.put("message", safe(message));
-            params.put("item_id", safe(itemId));
-            params.put("categories_id", safe(categoriesId));
-            params.put("inquiry_id", inquiryId);
+            params.put("app_email",       safe(config.getAppEmail()));
+            params.put("user_email",      safe(userEmail));
+            params.put("user_phone",      safe(userPhone));
+            params.put("term",            safe(term));
+            params.put("message",         safe(message));
+            params.put("item_id",         safe(itemId));
+            params.put("categories_id",   safe(categoriesId));
+            params.put("inquiry_id",      inquiryId);
+
+            if (extraParams != null) {
+                for (Map.Entry<String, String> entry : extraParams.entrySet()) {
+                    params.put(entry.getKey(), safe(entry.getValue()));
+                }
+            }
 
             JSONObject body = new JSONObject();
-            body.put("service_id", config.getServiceId());
-            body.put("template_id", config.getInquiryTemplateId());
-            body.put("user_id", config.getPublicKey());
+            body.put("service_id",      config.getServiceId());
+            body.put("template_id",     config.getInquiryTemplateId());
+            body.put("user_id",         config.getPublicKey());
             body.put("template_params", params);
 
             Log.d(TAG, "Sending inquiry → " + ownerEmail + " | id=" + inquiryId);
 
-            // Pre-save to Firebase (optimistic)
             if (config.isFirebaseEnabled() && userUid != null) {
                 FirebaseEmailUtil.saveUserInquiry(
                         config, userUid, inquiryId, itemId,

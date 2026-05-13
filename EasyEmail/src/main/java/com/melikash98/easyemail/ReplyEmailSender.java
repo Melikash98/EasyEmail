@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -36,6 +38,7 @@ public class ReplyEmailSender {
             String userEmail,
             String userPhotoUrl,
             String userUid,
+            @Nullable Map<String, String> extraParams,
             EmailCallback callback
     ) {
         OkHttpClient client = new OkHttpClient();
@@ -45,6 +48,10 @@ public class ReplyEmailSender {
                     .format(new Date());
 
             JSONObject params = new JSONObject();
+
+            for (Map.Entry<String, String> entry : config.getDefaultReplyParams().entrySet()) {
+                params.put(entry.getKey(), safe(entry.getValue()));
+            }
             params.put("owner_email",    safe(ownerEmail));
             params.put("owner_name",     safe(ownerName));
             params.put("app_email",      safe(config.getAppEmail()));
@@ -56,10 +63,16 @@ public class ReplyEmailSender {
             params.put("inquiry_id",     safe(inquiryId));
             params.put("time",           formattedTime);
 
+            if (extraParams != null) {
+                for (Map.Entry<String, String> entry : extraParams.entrySet()) {
+                    params.put(entry.getKey(), safe(entry.getValue()));
+                }
+            }
+
             JSONObject body = new JSONObject();
-            body.put("service_id",    config.getServiceId());
-            body.put("template_id",   config.getReplyTemplateId());
-            body.put("user_id",       config.getPublicKey());
+            body.put("service_id",      config.getServiceId());
+            body.put("template_id",     config.getReplyTemplateId());
+            body.put("user_id",         config.getPublicKey());
             body.put("template_params", params);
 
             Log.d(TAG, "Sending reply → " + ownerEmail + " | inquiryId=" + inquiryId);
@@ -104,7 +117,6 @@ public class ReplyEmailSender {
                     });
                 }
             });
-
         } catch (Exception e) {
             Log.e(TAG, "Exception building reply", e);
             if (callback != null) callback.onError("Internal error: " + e.getMessage());
