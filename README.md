@@ -11,7 +11,7 @@
 
 EasyEmail handles the full email workflow in Android apps: sending contact/inquiry emails, owner replies, fetching replies from an IMAP inbox, and storing everything in Firebase — all with a single fluent API.
 
-> ⚠️ **EmailJS Only** — This library exclusively supports [EmailJS](https://www.emailjs.com/) as the email delivery provider. SMTP or other providers are not supported.
+>  **EmailJS Only** — This library exclusively supports [EmailJS](https://www.emailjs.com/) as the email delivery provider. SMTP or other providers are not supported.
 
 ---
 
@@ -153,259 +153,273 @@ EmailJsConfig config = new EmailJsConfig.Builder()
     .setAppPassword("your_app_password")
     .build();
 ```
-
 ---
-##  Usage
 
-### XML
-```xml
-<com.melikash98.editify.CustomInputEdit
-    android:id="@+id/myCustomInput"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+##  Configuration — `EmailJsConfig`
 
-    <!-- Hint configuration -->
-    app:hintText="Username"                    <!-- Main hint text -->
-    app:hintIcon="@drawable/ic_user"          <!-- Icon inside hint -->
-    app:hintColor="@color/gray"               <!-- Default hint color -->
-    app:hintActiveColor="@color/green"        <!-- Color when focused/active -->
-    app:hintBackgroundColor="@color/white"    <!-- Background of the floating hint -->
-
-    <!-- Input text styling -->
-    app:inputColor="@color/black"             <!-- Text color inside the input field -->
-    app:textColor="@color/black"              <!-- Fallback text color -->
-
-    <!-- Font & Size Configuration -->
-    app:hintFamily="@font/vazirmatn_medium"   <!-- Hint font (supports @font/ or font family name) -->
-    app:hintSize="16sp"                       <!-- Hint text size -->
-
-    app:inputFamily="@font/vazirmatn"         <!-- Input field font -->
-    app:inputSize="17sp"                      <!-- Input text size -->
-
-    app:helperFamily="@font/vazirmatn_light"  <!-- Helper/Warning/Error font -->
-    app:helperSize="13.5sp"                   <!-- Helper/Warning/Error text size -->
-
-    <!-- Multiline (optional) -->
-    android:singleLine="false"               <!-- false = multiline, true = single line -->
-    android:maxLines="5"                     <!-- Max lines before scroll -->
-    android:minLines="1"                     <!-- Min height in lines -->
-
-    <!-- Background states -->
-    app:activeBackground="@drawable/input_active"     <!-- Background when focused -->
-    app:inactiveBackground="@drawable/input_inactive" <!-- Default background -->
-
-    <!-- Helper / Warning / Error messages -->
-    app:helperText="Enter your username"      <!-- Helper message -->
-    app:warningText="Please check your input" <!-- Warning message -->
-    app:errorText="This field is required"    <!-- Error message -->
-
-    <!-- Password toggle icons -->
-    app:passShow="@drawable/ic_show"          <!-- Icon when password is visible -->
-    app:passHide="@drawable/ic_hide"          <!-- Icon when password is hidden -->
-
-    <!-- Layout direction -->
-    app:rightDirection="false"                <!-- Set true for RTL languages -->
-
-    <!-- Input Type (especially for passwords) -->
-    <!-- app:inputType="textPassword"  -->              <!-- Text Password (hidden) -->
-    <!-- app:inputType="numberPassword"  -->              <!-- Number Password -->
-    <!-- app:inputType="text"   -->              <!-- Normal text (default) -->
-
-
-    <!-- Dropdown -->
-    app:dropdownMode="false"                       <!-- true = disables keyboard, shows dropdown arrow -->
-    app:dropdownBackground="@color/white"          <!-- Background color of the dropdown popup card -->
-    app:dropdownItemTextColor="@color/black"       <!-- Text color of each dropdown item -->
-    app:dropdownItemTextSize="15sp"                <!-- Font size of each dropdown item text -->
-    app:dropdownItemFamily="@font/vazirmatn"       <!-- Font applied to dropdown item texts -->
-    app:dropdownItemIcon="@drawable/ic_list_item"  <!-- Default icon for items that have no custom icon -->
-    app:dropdownSelectedColor="@color/primary"     <!-- Highlight color for the currently selected item -->
-    app:dropdownDividerColor="@color/gray_light"   <!-- Color of the divider line between items -->
-    app:dropdownItemHeight="52dp"                  <!-- Height of each individual dropdown item row -->
-    app:dropdownMaxHeight="220dp"                  <!-- Max height of the dropdown popup before it scrolls -->
-
-    <!-- Button Mode -->
-    app:buttonMode="false"                         <!-- true = disables input, entire field acts as a button -->
-    />
-
-```
-
-
----
-##  Java Usage
+All configuration is done via the `Builder`. Most fields have sensible defaults.
 
 ```java
-// Get reference to the custom input view
-CustomInputEdit input = findViewById(R.id.myCustomInput);
+EmailJsConfig config = new EmailJsConfig.Builder()
 
-// Get current text value (trimmed)
-String text = input.getText();
+    // ── Required for sending ──────────────────────────────────────
+    .setServiceId("service_xxxxxxx")          // EmailJS Service ID
+    .setPublicKey("your_public_key")          // EmailJS Public Key
+    .setInquiryTemplateId("template_xxxxxxx") // Template ID for inquiries
 
-// Set text programmatically
-input.setText("Hello");
+    // ── Required for replies ──────────────────────────────────────
+    .setReplyTemplateId("template_yyyyyyy")   // Template ID for replies
 
-// Show helper message (green state)
-input.setHelperText("Helper message");
+    // ── Required for IMAP fetching ────────────────────────────────
+    .setAppEmail("your.app@gmail.com")        // IMAP login email
+    .setAppPassword("xxxx xxxx xxxx xxxx")    // App password (NOT your real password)
+    .setImapHost("imap.gmail.com")            // Default: "imap.gmail.com"
+    .setImapPort(993)                         // Default: 993
 
-// Show warning message (yellow state)
-input.setWarningText("Warning message");
+    // ── Firebase (optional) ───────────────────────────────────────
+    .setFirebaseEnabled(true)                 // Default: true
+    .setFirebaseInquiryRoot("Emails")         // Root node for inquiries. Default: "Emails"
+    .setFirebaseUserRoot("Users")             // Root node for users. Default: "Users"
 
-// Show error message (red state)
-input.setErrorText("Error message");
+    // ── Notifications (optional) ──────────────────────────────────
+    .setNotificationsEnabled(true)            // Default: true
+    .setNotificationTitle("New Reply")        // Default: "New Reply"
+    .setNotificationBody("You have received a new reply.") // Default value
 
-// Add dropdown items
-input.addDropdownItem("Lable", "Value");
-// Add items with icon
-input.addDropdownItem("Iran", "IR", R.drawable.ic_flag_ir);
+    // ── Custom default template params (optional) ─────────────────
+    .setDefaultInquiryParams(myInquiryMap)    // Extra fixed params for inquiry template
+    .setDefaultReplyParams(myReplyMap)        // Extra fixed params for reply template
 
-// Handle item selection
-input.setOnDropdownItemSelectedListener(new CustomInputEdit.OnDropdownItemSelectedListener() {
-    @Override
-    public void onItemSelected(DropdownItem dropdownItem, int position) {
-        // Save selected gender value
-       TextView text = dropdownItem.value;
-    }
-});
+    // ── Advanced (optional) ───────────────────────────────────────
+    .setEmailJsApiUrl("https://api.emailjs.com/api/v1.0/email/send") // Default value
 
-// Set items from a list
-List<DropdownItem> items = new ArrayList<>();
-items.add(new DropdownItem("Iran", "IR"));
-items.add(new DropdownItem("Germany", "DE"));
-dropdown.setDropdownItems(items);
+    .build();
+```
 
-// Get selected value
-String selectedValue = dropdown.getSelectedValue();
-DropdownItem selectedItem = dropdown.getSelectedDropdownItem();
+> **Gmail IMAP note:** Google no longer allows sign-in with your normal password from third-party apps. You must generate an **App Password** from your Google Account → Security → 2-Step Verification → App Passwords.
 
-// Select item programmatically
-dropdown.setSelectedValue("IR");
+---
 
+##  Usage
+
+### Initialize
+
+```java
+EasyEmail easyEmail = new EasyEmail(config);
 ```
 ---
 
-## Kotlin Usage
----
-```kotlin
-class MainActivity : AppCompatActivity() {
+### 1. Send an Inquiry
 
-    private lateinit var emailInput: CustomInputEdit
+Use this when a user wants to contact an owner/seller/host.
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+```java
+easyEmail.sendInquiry(
+    "owner@example.com",   // ownerEmail  — recipient
+    "John Owner",          // ownerName
+    "https://...",         // ownerPhotoUrl (can be null or empty)
+    "Alice User",          // userName     — sender
+    "alice@example.com",   // userEmail
+    "+1234567890",         // userPhone
+    "Flexible",            // term
+    "",                    // time (leave empty to auto-fill current time)
+    "Hello, is this still available?", // message
+    "item_001",            // itemId
+    "cat_furniture",       // categoriesId
+    "uid_abc123",          // userUid (Firebase UID, nullable)
+    new EmailCallback() {
+        @Override
+        public void onSuccess() {
+            // called on main thread — safe to update UI
+            Toast.makeText(context, "Inquiry sent!", Toast.LENGTH_SHORT).show();
+        }
 
-        emailInput = findViewById(R.id.emailInput)
-
-        // Set text programmatically
-        emailInput.setText("test@example.com")
-
-        // Get input text
-        val value = emailInput.getText()
-
-        // Update helper message
-        emailInput.setHelperText("Looks good")
-
-        // Show warning
-        emailInput.setWarningText("Please double check your email")
-
-        // Show error
-        emailInput.setErrorText("Invalid email address")
-
-        val dropdown = findViewById<CustomInputEdit>(R.id.countryDropdown)
-
-        dropdown.addDropdownItem("Iran", "IR", R.drawable.ic_flag_ir)
-        dropdown.addDropdownItem("Germany", "DE")
-
-        dropdown.setOnDropdownItemSelectedListener { item, position ->
-              Toast.makeText(this, "Selected: ${item.label}", Toast.LENGTH_SHORT).show()
-         }
-
-        val selected = dropdown.getSelectedValue()
+        @Override
+        public void onError(String error) {
+            // called on main thread
+            Log.e("EasyEmail", "Error: " + error);
+        }
     }
+);
+```
+
+#### With extra template params
+
+```java
+Map<String, String> extras = new HashMap<>();
+extras.put("property_type", "Apartment");
+extras.put("floor_number",  "3");
+
+easyEmail.sendInquiry(
+    ownerEmail, ownerName, ownerPhotoUrl,
+    userName, userEmail, userPhone,
+    term, time, message, itemId, categoriesId, userUid,
+    extras,       // <-- extra params merged into the EmailJS template
+    callback
+);
+```
+
+---
+
+### 2. Send a Reply
+
+Use this when an owner wants to reply to an inquiry. The reply is sent via EmailJS **and** optionally saved to Firebase.
+
+```java
+easyEmail.sendReply(
+    "owner@example.com",    // ownerEmail  — sender of the reply
+    "John Owner",           // ownerName
+    "Yes, it is available. Please contact me.", // replyMessage
+    "inquiry-uuid-here",    // inquiryId   — must match the original inquiry
+    "item_001",             // itemId
+    "Alice User",           // userName    — original inquiry sender
+    "alice@example.com",    // userEmail
+    "https://...",          // userPhotoUrl
+    "uid_abc123",           // userUid (Firebase UID, nullable)
+    new EmailCallback() {
+        @Override
+        public void onSuccess() {
+            Toast.makeText(context, "Reply sent!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onError(String error) {
+            Log.e("EasyEmail", "Reply error: " + error);
+        }
+    }
+);
+```
+
+---
+
+### 3. Fetch Owner Replies (IMAP)
+
+Use this to pull replies that an owner sent from their email client (outside the app) into Firebase, so the user can see them inside the app.
+
+```java
+easyEmail.fetchOwnerReplies(
+    "uid_abc123",          // userUid
+    "inquiry-uuid-here",   // inquiryId (must appear in the email subject)
+    "https://...",         // ownerPhotoUrl
+    new EmailCallback() {
+        @Override
+        public void onSuccess() {
+            //  Note: this callback is on a background thread.
+            // Post to the main thread before updating any UI.
+            runOnUiThread(() ->
+                Toast.makeText(context, "Replies fetched!", Toast.LENGTH_SHORT).show()
+            );
+        }
+
+        @Override
+        public void onError(String error) {
+            runOnUiThread(() -> Log.e("EasyEmail", "IMAP error: " + error));
+        }
+    }
+);
+```
+
+>  **Thread notice:** Unlike `sendInquiry` and `sendReply`, the `fetchOwnerReplies` callback is delivered on a **background thread**. Wrap any UI updates inside `runOnUiThread {}` or `Handler(Looper.getMainLooper()).post {}`.
+
+---
+
+## 🔥 Firebase Data Structure
+When `firebaseEnabled = true`, the library writes to Firebase Realtime Database using the following structure:
+
+```
+{firebaseUserRoot}/                          ← default: "Users"
+  └── {userUid}/
+        ├── inquiries/
+        │     └── {inquiryId}/
+        │           ├── userUid
+        │           ├── inquiryId
+        │           ├── itemId
+        │           ├── categoriesId
+        │           ├── ownerEmail
+        │           ├── ownerName
+        │           ├── ownerPhoto
+        │           ├── userName
+        │           ├── sentAt          ← ServerValue.TIMESTAMP
+        │           ├── status          ← "sent"
+        │           └── replies/
+        │                 └── {pushId}/
+        │                       ├── replyId
+        │                       ├── replyText
+        │                       ├── isOwnerReply   ← true / false
+        │                       ├── replyDate
+        │                       ├── receivedAt
+        │                       └── isRead
+        ├── MessageNotification/
+        │     └── {pushId}/
+        │           ├── message
+        │           ├── type            ← "NEW_REPLY"
+        │           ├── inquiryId
+        │           ├── replyId
+        │           ├── isRead
+        │           └── timestamp
+        └── unreadReplyCount            ← integer
+
+{firebaseInquiryRoot}/                       ← default: "Emails"
+  └── {inquiryId}/
+        └── (same fields as user inquiry node)
+```
+
+---
+
+##  Known Limitations
+
+- **EmailJS only** — no SMTP, SendGrid, or other provider support.
+- **IMAP deduplication** — `fetchOwnerReplies` scans the last 50 inbox messages every time it is called. Calling it multiple times for the same inquiry **will save duplicate reply entries** in Firebase. Implement your own call guard (e.g. check `status` in Firebase before fetching) if needed.
+- **OkHttpClient instances** — a new `OkHttpClient` is created per send call. For high-frequency use, consider wrapping `EasyEmail` as a singleton in your app.
+- **App password security** — your IMAP app password is held in memory inside `EmailJsConfig`. Do not log the config object and do not store the password in plain-text source files. Use `BuildConfig` fields or an encrypted store instead.
+
+---
+
+## 📋 API Reference
+
+### `EasyEmail`
+
+| Method | Description |
+|--------|-------------|
+| `sendInquiry(...)` | Send an inquiry email via EmailJS |
+| `sendInquiry(..., extraParams, callback)` | Same, with extra template variables |
+| `sendReply(...)` | Send a reply email via EmailJS |
+| `sendReply(..., extraParams, callback)` | Same, with extra template variables |
+| `fetchOwnerReplies(userUid, inquiryId, ownerPhotoUrl, callback)` | Fetch IMAP replies and save to Firebase |
+
+### `EmailCallback`
+
+```java
+public interface EmailCallback {
+    void onSuccess();
+    void onError(String error);
 }
 ```
----
 
-##  Attributes
+### `EmailJsConfig.Builder` — all fields
 
-
-| Attribute | Description |
-|----------|------------|
-| hintText | Hint text |
-| input | Default input text |
-| helperText | Helper message |
-| warningText | Warning message |
-| errorText | Error message |
-| hintIcon | Icon shown inside the hint |
-| passShow | Show password icon |
-| passHide | Hide password icon |
-| helperIcon | Helper icon |
-| warningIcon | Warning icon |
-| errorIcon | Error icon |
-| activeBackground | Background when the field is focused/active |
-| inactiveBackground | Default (inactive) background |
-| hintColor | Default hint color |
-| hintActiveColor | Hint color when focused |
-| inputColor | Color of text inside the input field |
-| helperColor | Helper text and icon color |
-| warningColor | Warning text and icon color |
-| errorColor | Error text and icon color |
-| inputType | Input type (especially useful for passwords) |
-| rightDirection | Enable RTL layout (true/false) |
-| hintFamily | Font family for hint (@font/ resource or font name) |
-| hintSize | Text size for hint |
-| inputFamily | Font family for input field |
-| inputSize | Text size for input field |
-| helperFamily | Font family for helper/warning/error texts |
-| helperSize | Text size for helper/warning/error texts |
-| dropdownMode | Enable dropdown mode (true/false) |
-| dropdownBackground | Background of the dropdown menu |
-| dropdownItemTextColor | Text color of dropdown items |
-| dropdownItemTextSize | Text size of dropdown items |
-| dropdownItemFamily | Font family of dropdown items |
-| dropdownItemIcon | Icon shown beside each dropdown item |
-| dropdownArrowIcon | Arrow icon for the dropdown field |
-| dropdownSelectedColor | Color of the selected dropdown item |
-| dropdownDividerColor | Divider color between dropdown items |
-| dropdownItemHeight | Height of each dropdown item |
-| dropdownMaxHeight | Maximum height of the dropdown list |
-| buttonMode | Enable button mode (true/false) |
----
-
-##  Input Types
-
-```xml
-app:inputType="text"      <!-- Normal Text -->
-app:inputType="numberPassword"    <!-- Password (Text) -->
-app:inputType="textPassword"    <!-- Password (Number) -->
-```
+| Method | Default | Required |
+|--------|---------|----------|
+| `setServiceId(String)` | — | ✅ for send |
+| `setPublicKey(String)` | — | ✅ for send |
+| `setInquiryTemplateId(String)` | — | ✅ for send |
+| `setReplyTemplateId(String)` | — | ✅ for reply |
+| `setAppEmail(String)` | — | ✅ for fetch |
+| `setAppPassword(String)` | — | ✅ for fetch |
+| `setImapHost(String)` | `imap.gmail.com` | |
+| `setImapPort(int)` | `993` | |
+| `setEmailJsApiUrl(String)` | EmailJS v1.0 URL | |
+| `setFirebaseEnabled(boolean)` | `true` | |
+| `setFirebaseInquiryRoot(String)` | `"Emails"` | |
+| `setFirebaseUserRoot(String)` | `"Users"` | |
+| `setNotificationsEnabled(boolean)` | `true` | |
+| `setNotificationTitle(String)` | `"New Reply"` | |
+| `setNotificationBody(String)` | `"You have received a new reply."` | |
+| `setDefaultInquiryParams(Map)` | empty | |
+| `setDefaultReplyParams(Map)` | empty | |
 
 ---
 
-##  RTL Support
-
-```xml
-app:rightDirection="true"
-```
-
----
-##  Dropdown
-```xml
-
-app:dropdownMode="false"                       <!-- true = disables keyboard, shows dropdown arrow -->
-app:dropdownBackground="@color/white"          <!-- Background color of the dropdown popup card -->
-app:dropdownItemTextColor="@color/black"       <!-- Text color of each dropdown item -->
-app:dropdownItemTextSize="15sp"                <!-- Font size of each dropdown item text -->
-app:dropdownItemFamily="@font/vazirmatn"       <!-- Font applied to dropdown item texts -->
-app:dropdownItemIcon="@drawable/ic_list_item"  <!-- Default icon for items that have no custom icon -->
-app:dropdownSelectedColor="@color/primary"     <!-- Highlight color for the currently selected item -->
-app:dropdownDividerColor="@color/gray_light"   <!-- Color of the divider line between items -->
-app:dropdownItemHeight="52dp"                  <!-- Height of each individual dropdown item row -->
-app:dropdownMaxHeight="220dp"                  <!-- Max height of the dropdown popup before it scrolls -->
-
-```
-
----
 ##  License
 This project is licensed under the MIT License.
 
