@@ -3,6 +3,8 @@ package com.melikash98.easyemail;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.work.Constraints;
@@ -14,6 +16,7 @@ import androidx.work.WorkManager;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -83,18 +86,32 @@ public class EmailQueueManager {
                 job.payload   = payload.toString();
                 job.createdAt = System.currentTimeMillis();
                 job.status    = "PENDING";
-                dao.insert(job);
 
+                EmailStateLiveData.getInstance().post(EmailState.loading());
+
+                dao.insert(job);
                 scheduleWorker();
+
                 Log.d(TAG, "Enqueued job: " + jobId + " type=" + type
                         + " online=" + isOnline());
 
-                if (callback != null && isOnline()) {
+                if (!isOnline()) {
+                    List<PendingEmail> pending = dao.getPending();
+                    int count = pending.size();
+                    EmailStateLiveData.getInstance().post(EmailState.queued(count));
+                    if (callback != null) {
+                        new Handler(Looper.getMainLooper()).post(() ->
+                                callback.onError("QUEUED: ایمیل در صف قرار گرفت"));
+                    }
                 }
 
             } catch (Exception e) {
                 Log.e(TAG, "Enqueue failed", e);
-                if (callback != null) callback.onError("Enqueue failed: " + e.getMessage());
+                EmailStateLiveData.getInstance().post(EmailState.failed(e.getMessage()));
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            callback.onError("Enqueue failed: " + e.getMessage()));
+                }
             }
         }).start();
     }

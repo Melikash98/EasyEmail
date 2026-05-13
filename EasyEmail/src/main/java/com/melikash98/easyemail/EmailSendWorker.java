@@ -28,8 +28,6 @@ public class EmailSendWorker extends Worker {
         List<PendingEmail> jobs = dao.getPending();
 
         if (jobs.isEmpty()) return Result.success();
-
-        // Rebuild config from stored payload (config fields are embedded in payload)
         for (PendingEmail job : jobs) {
             try {
                 dao.updateStatus(job.id, "SENDING");
@@ -48,6 +46,7 @@ public class EmailSendWorker extends Worker {
                 if (sent) {
                     dao.delete(job.id);
                     Log.d(TAG, "Job sent and removed: " + job.id);
+                    EmailStateLiveData.getInstance().post(EmailState.success());
                 } else {
                     handleFailure(dao, job);
                 }
@@ -64,6 +63,8 @@ public class EmailSendWorker extends Worker {
         if (job.retryCount >= MAX_RETRY - 1) {
             dao.updateStatus(job.id, "FAILED");
             Log.w(TAG, "Job permanently failed: " + job.id);
+            EmailStateLiveData.getInstance().post(
+                    EmailState.failed("Send email after " + MAX_RETRY + "The attempt was unsuccessful."));
         } else {
             dao.updateStatus(job.id, "PENDING");
         }
