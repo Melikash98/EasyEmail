@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters;
 
 import com.melikash98.easyemail.Config.EmailJsConfig;
 import com.melikash98.easyemail.Config.EmailJsConfigSerializer;
+import com.melikash98.easyemail.Interface.PendingEmailDao;
 
 import org.json.JSONObject;
 

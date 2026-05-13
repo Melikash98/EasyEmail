@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.Nullable;
 
 import com.melikash98.easyemail.Config.EmailJsConfig;
+import com.melikash98.easyemail.Interface.EmailCallback;
 
 import java.util.Map;
 

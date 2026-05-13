@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.melikash98.easyemail.Config.EmailJsConfig;
+import com.melikash98.easyemail.Interface.EmailCallback;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;

@@ -15,6 +15,8 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.melikash98.easyemail.Config.EmailJsConfig;
+import com.melikash98.easyemail.Interface.EmailCallback;
+import com.melikash98.easyemail.Interface.PendingEmailDao;
 
 import org.json.JSONObject;
 
