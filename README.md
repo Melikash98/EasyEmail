@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_logo.png" alt="Logo" width="500px"   height="250px" style="margin-right: 10px;padding-top: 6rem;" />
 
-# Editify
+# EasyEmail
 
 [![](https://jitpack.io/v/Melikash98/Editify.svg)](https://jitpack.io/#Melikash98/Editify)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
