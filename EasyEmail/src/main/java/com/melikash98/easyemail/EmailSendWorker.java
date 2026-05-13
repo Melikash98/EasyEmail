@@ -11,14 +11,46 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+/**
+ * Background worker responsible for sending queued emails.
+ * <p>
+ * This worker is triggered by WorkManager when network connectivity is available.
+ * It reads pending email jobs from the local Room database, restores the payload,
+ * and sends each job using the appropriate sender implementation.
+ * <p>
+ * If sending fails, the job is retried until the maximum retry limit is reached.
+ */
+
 public class EmailSendWorker extends Worker {
 
     private static final String TAG = "EasyEmail_Worker";
-    public  static final int    MAX_RETRY = 3;
+    public static final int MAX_RETRY = 3;
+
+    /**
+     * Creates a new worker instance.
+     *
+     * @param context application context provided by WorkManager
+     * @param params  worker runtime parameters
+     */
 
     public EmailSendWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
+
+    /**
+     * Executes the background email sending task.
+     * <p>
+     * The worker performs the following steps:
+     * <ol>
+     *     <li>Loads all pending jobs from the local database</li>
+     *     <li>Restores each job payload from JSON</li>
+     *     <li>Chooses the correct sender based on job type</li>
+     *     <li>Deletes successful jobs from the queue</li>
+     *     <li>Updates retry status for failed jobs</li>
+     * </ol>
+     *
+     * @return {@link Result#success()} when processing completes
+     */
 
     @NonNull
     @Override
@@ -58,6 +90,16 @@ public class EmailSendWorker extends Worker {
         }
         return Result.success();
     }
+
+    /**
+     * Handles a failed send attempt.
+     * <p>
+     * If the retry limit has been reached, the job is marked as failed permanently.
+     * Otherwise, it is returned to the pending state so WorkManager can try again later.
+     *
+     * @param dao database access object used to update the job state
+     * @param job the failed email job
+     */
 
     private void handleFailure(PendingEmailDao dao, PendingEmail job) {
         if (job.retryCount >= MAX_RETRY - 1) {
