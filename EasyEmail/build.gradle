@@ -59,7 +59,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Melikash98'
                 artifactId = 'EasyEmail'
-                version = '1.0.3'
+                version = '1.0.4'
             }
         }
     }

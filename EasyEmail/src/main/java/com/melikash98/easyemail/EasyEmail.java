@@ -80,7 +80,7 @@ public class EasyEmail {
         queueManager.enqueueInquiry(
                 ownerEmail, ownerName, ownerPhotoUrl, userName,
                 userEmail, userPhone, term, time, message, itemId, categoriesId,
-                userUid, callback
+                userUid, null, callback
         );
     }
 
