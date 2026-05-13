@@ -6,8 +6,6 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.melikash98.easyemail.Interface.PendingEmailDao;
-
 @Database(entities = {PendingEmail.class}, version = 1, exportSchema = false)
 public abstract class EasyEmailDatabase extends RoomDatabase {
 

@@ -1,4 +1,4 @@
-package com.melikash98.easyemail.Config;
+package com.melikash98.easyemail;
 
 import org.json.JSONObject;
 

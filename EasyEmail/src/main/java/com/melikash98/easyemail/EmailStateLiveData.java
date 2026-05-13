@@ -1,4 +1,4 @@
-package com.melikash98.easyemail.State;
+package com.melikash98.easyemail;
 
 import androidx.lifecycle.MutableLiveData;
 

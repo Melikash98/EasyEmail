@@ -1,12 +1,10 @@
-package com.melikash98.easyemail.Interface;
+package com.melikash98.easyemail;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-
-import com.melikash98.easyemail.PendingEmail;
 
 import java.util.List;
 

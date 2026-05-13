@@ -7,9 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.melikash98.easyemail.Config.EmailJsConfig;
-import com.melikash98.easyemail.Interface.EmailCallback;
-
 import org.json.JSONObject;
 
 import java.io.IOException;

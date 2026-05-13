@@ -1,4 +1,4 @@
-package com.melikash98.easyemail.Interface;
+package com.melikash98.easyemail;
 
 
 /**

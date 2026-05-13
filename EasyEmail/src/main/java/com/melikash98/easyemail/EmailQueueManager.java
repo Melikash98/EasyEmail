@@ -14,12 +14,6 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-import com.melikash98.easyemail.Config.EmailJsConfig;
-import com.melikash98.easyemail.Interface.EmailCallback;
-import com.melikash98.easyemail.Interface.PendingEmailDao;
-import com.melikash98.easyemail.State.EmailState;
-import com.melikash98.easyemail.State.EmailStateLiveData;
-
 import org.json.JSONObject;
 
 import java.util.List;
