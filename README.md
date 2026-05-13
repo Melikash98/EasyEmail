@@ -429,10 +429,14 @@ This project is licensed under the MIT License.
 android email library, emailjs android, android inquiry email,android imap library, firebase email android, android contact form library,send email android java
 
 ---
-## 👩‍💻 Author
+## 👨‍💻 Author
 
-If you find MorphNavBar useful, please consider giving it a ⭐ star on GitHub — it helps the project grow and motivates further development.
+**Melikash98**
 
-For feature requests, improvements, bug reports, or similar suggestions, please send me a message or open an issue. Your feedback is highly appreciated.
+If you find EasyEmail useful, please consider giving it a ⭐ star on GitHub —
+it helps the project grow and motivates further development.
+
+For feature requests, bug reports, or suggestions, please open an issue.
+Your feedback is highly appreciated.
 
 
