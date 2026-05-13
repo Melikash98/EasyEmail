@@ -123,12 +123,11 @@ public class EasyEmail {
             EmailCallback callback
     ) {
         config.validateForSend();
-        EmailSender.send(
-                config, ownerEmail, ownerName, ownerPhotoUrl,
+        queueManager.enqueueInquiry(
+                ownerEmail, ownerName, ownerPhotoUrl,
                 userName, userEmail, userPhone,
-                term, time, message, itemId, categoriesId, userUid,
-                extraParams,
-                callback
+                term, time, message, itemId, categoriesId,
+                userUid, extraParams, callback
         );
     }
 
@@ -202,12 +201,10 @@ public class EasyEmail {
             EmailCallback callback
     ) {
         config.validateForReply();
-        ReplyEmailSender.send(
-                config, ownerEmail, ownerName, replyMessage,
+        queueManager.enqueueReply(
+                ownerEmail, ownerName, replyMessage,
                 inquiryId, itemId, userName, userEmail,
-                userPhotoUrl, userUid,
-                extraParams,
-                callback
+                userPhotoUrl, userUid, extraParams, callback
         );
     }
 
