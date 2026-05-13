@@ -185,38 +185,38 @@ public class EmailSender {
      */
     static boolean sendSync(EmailJsConfig config, JSONObject payload) {
         try {
-            String inquiryId    = payload.optString("inquiryId");
-            String ownerEmail   = payload.optString("ownerEmail");
-            String ownerName    = payload.optString("ownerName");
-            String ownerPhotoUrl= payload.optString("ownerPhotoUrl");
-            String userName     = payload.optString("userName");
-            String userEmail    = payload.optString("userEmail");
-            String userPhone    = payload.optString("userPhone");
-            String term         = payload.optString("term");
-            String time         = payload.optString("time");
-            String message      = payload.optString("message");
-            String itemId       = payload.optString("itemId");
-            String categoriesId = payload.optString("categoriesId");
-            String userUid      = payload.optString("userUid");
+            String inquiryId     = payload.optString("inquiryId");
+            String ownerEmail    = payload.optString("ownerEmail");
+            String ownerName     = payload.optString("ownerName");
+            String ownerPhotoUrl = payload.optString("ownerPhotoUrl");
+            String userName      = payload.optString("userName");
+            String userEmail     = payload.optString("userEmail");
+            String userPhone     = payload.optString("userPhone");
+            String term          = payload.optString("term");
+            String time          = payload.optString("time");
+            String message       = payload.optString("message");
+            String itemId        = payload.optString("itemId");
+            String categoriesId  = payload.optString("categoriesId");
+            String userUid       = payload.optString("userUid");
 
             JSONObject params = new JSONObject();
             for (Map.Entry<String, String> entry : config.getDefaultInquiryParams().entrySet())
                 params.put(entry.getKey(), safe(entry.getValue()));
 
-            params.put("name",           safe(userName));
-            params.put("user_name",      safe(userName));
-            params.put("time",           time);
-            params.put("owner_email",    safe(ownerEmail));
-            params.put("owner_name",     safe(ownerName));
-            params.put("owner_photo_url",safe(ownerPhotoUrl));
-            params.put("app_email",      safe(config.getAppEmail()));
-            params.put("user_email",     safe(userEmail));
-            params.put("user_phone",     safe(userPhone));
-            params.put("term",           safe(term));
-            params.put("message",        safe(message));
-            params.put("item_id",        safe(itemId));
-            params.put("categories_id",  safe(categoriesId));
-            params.put("inquiry_id",     inquiryId);
+            params.put("name",            safe(userName));
+            params.put("user_name",       safe(userName));
+            params.put("time",            time);
+            params.put("owner_email",     safe(ownerEmail));
+            params.put("owner_name",      safe(ownerName));
+            params.put("owner_photo_url", safe(ownerPhotoUrl));
+            params.put("app_email",       safe(config.getAppEmail()));
+            params.put("user_email",      safe(userEmail));
+            params.put("user_phone",      safe(userPhone));
+            params.put("term",            safe(term));
+            params.put("message",         safe(message));
+            params.put("item_id",         safe(itemId));
+            params.put("categories_id",   safe(categoriesId));
+            params.put("inquiry_id",      inquiryId);
 
             JSONObject extraJson = payload.optJSONObject("extraParams");
             if (extraJson != null) {
@@ -228,9 +228,9 @@ public class EmailSender {
             }
 
             JSONObject body = new JSONObject();
-            body.put("service_id",    config.getServiceId());
-            body.put("template_id",   config.getInquiryTemplateId());
-            body.put("user_id",       config.getPublicKey());
+            body.put("service_id",      config.getServiceId());
+            body.put("template_id",     config.getInquiryTemplateId());
+            body.put("user_id",         config.getPublicKey());
             body.put("template_params", params);
 
             OkHttpClient client = new OkHttpClient();
@@ -254,10 +254,12 @@ public class EmailSender {
                 }
                 return ok;
             }
+
         } catch (Exception e) {
             Log.e(TAG, "sendSync failed", e);
             return false;
         }
+    }
 
     /**
      * Returns the given string as-is, or an empty string if it is null.

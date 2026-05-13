@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import javax.xml.transform.Result;
-
 public class EmailSendWorker extends Worker {
 
     private static final String TAG = "EasyEmail_Worker";
