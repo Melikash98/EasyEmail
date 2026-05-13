@@ -78,6 +78,11 @@ dependencies {
 
     // Firebase (only if firebaseEnabled = true)
     implementation 'com.google.firebase:firebase-database:21.0.0'
+
+   // WorkManager And Room
+   implementation 'androidx.work:work-runtime:2.x.x'
+   implementation 'androidx.room:room-runtime:2.x.x'
+   annotationProcessor 'androidx.room:room-compiler:2.x.x'
 }
 ```
 ---
@@ -205,7 +210,7 @@ EmailJsConfig config = new EmailJsConfig.Builder()
 ### Initialize
 
 ```java
-EasyEmail easyEmail = new EasyEmail(config);
+EasyEmail easyEmail = new EasyEmail(context, config);
 ```
 ---
 
