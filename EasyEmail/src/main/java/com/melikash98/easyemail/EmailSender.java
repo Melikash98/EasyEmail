@@ -99,7 +99,6 @@ public class EmailSender {
                     mainHandler.post(() -> {
                         if (callback != null) callback.onError("Network error: " + e.getMessage());
                     });
-
                 }
 
                 @Override
