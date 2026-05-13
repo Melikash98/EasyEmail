@@ -30,7 +30,7 @@ Editify provides a modern `CustomInputEdit` component that replaces the default 
 
 ##  Demo
 
-<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="45%"   height="45%" style="margin-right: 10px;padding-top: 6rem;" />
+<img src="https://raw.githubusercontent.com/Melikash98/EasyEmail/main/easy_email_demo.gif" alt="easy_email_demo.gif" width="35%"   height="35%" style="margin-right: 10px;padding-top: 6rem;" />
 
 ---
 
