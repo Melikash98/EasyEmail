@@ -426,7 +426,7 @@ This project is licensed under the MIT License.
 ---
 ## Keywords
 
-android custom edittext, floating hint edittext, material input field android, password toggle edittext, android ui library, custom input view
+android email library, emailjs android, android inquiry email,android imap library, firebase email android, android contact form library,send email android java
 
 ---
 ## 👩‍💻 Author
