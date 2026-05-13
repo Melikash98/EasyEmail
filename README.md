@@ -2,7 +2,7 @@
 
 # EasyEmail
 
-[![JitPack](https://jitpack.io/v/Melikash98/EasyEmail.svg)](https://jitpack.io/#Melikash98/EasyEmail)
+[![](https://jitpack.io/v/Melikash98/EasyEmail.svg)](https://jitpack.io/#Melikash98/EasyEmail)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Melikash98/EasyEmail/blob/main/LICENSE)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg)](https://android-arsenal.com/api?level=21)
 [![Platform](https://img.shields.io/badge/platform-Android-orange.svg)](https://developer.android.com)
@@ -59,7 +59,7 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-    implementation 'com.github.Melikash98:EasyEmail:v1.0.2'
+    implementation 'com.github.Melikash98:EasyEmail:v1.0.7'
 }
 ```
 
