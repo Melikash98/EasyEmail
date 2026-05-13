@@ -79,7 +79,82 @@ dependencies {
     // Firebase (only if firebaseEnabled = true)
     implementation 'com.google.firebase:firebase-database:21.0.0'
 }
+```
+---
+##  EmailJS Setup
+EasyEmail **only works with EmailJS**. You must create a free account and configure your templates before using this library.
 
+### 1. Create an EmailJS account
+
+Go to [https://www.emailjs.com](https://www.emailjs.com) and sign up for a free account.
+
+### 2. Connect an email service
+
+In your EmailJS dashboard, go to **Email Services** → **Add New Service** and connect your Gmail, Outlook, or any SMTP provider. Copy the **Service ID** (e.g. `service_xxxxxxx`).
+
+### 3. Create an Inquiry Template
+
+Go to **Email Templates** → **Create New Template**.
+
+This template is used when a user sends an inquiry. The following variables are automatically filled by the library — add any of them to your template:
+| Variable            | Description                          |
+|---------------------|--------------------------------------|
+| `{{name}}`          | User's display name                  |
+| `{{user_name}}`     | User's display name (alias)          |
+| `{{user_email}}`    | User's email address                 |
+| `{{user_phone}}`    | User's phone number                  |
+| `{{message}}`       | Inquiry message body                 |
+| `{{term}}`          | Term/condition field                 |
+| `{{time}}`          | Formatted send time (dd/MM/yyyy HH:mm) |
+| `{{owner_email}}`   | Receiver's (owner's) email           |
+| `{{owner_name}}`    | Receiver's (owner's) name            |
+| `{{owner_photo_url}}`| Receiver's photo URL                |
+| `{{app_email}}`     | Your app's email (from config)       |
+| `{{item_id}}`       | Item/listing ID                      |
+| `{{categories_id}}` | Category ID                          |
+| `{{inquiry_id}}`    | Auto-generated unique inquiry UUID   |
+
+Copy the **Template ID** (e.g. `template_xxxxxxx`).
+### 4. Create a Reply Template
+
+Create a second template for owner replies. Variables available:
+
+| Variable             | Description                        |
+|----------------------|------------------------------------|
+| `{{owner_email}}`    | Owner's email address              |
+| `{{owner_name}}`     | Owner's display name               |
+| `{{reply_message}}`  | The reply message body             |
+| `{{user_name}}`      | User being replied to              |
+| `{{name}}`           | User being replied to (alias)      |
+| `{{user_photo_url}}` | User's photo URL                   |
+| `{{item_id}}`        | Item/listing ID                    |
+| `{{inquiry_id}}`     | The original inquiry UUID          |
+| `{{time}}`           | Formatted reply time               |
+| `{{app_email}}`      | Your app's email (from config)     |
+
+> **Important:** For IMAP reply fetching to work, your reply template **must include `{{inquiry_id}}`** somewhere in the email **Subject** line, so the library can match incoming emails to the correct inquiry.
+
+Copy this template's **Template ID** as well.
+
+### 5. Get your Public Key
+
+In your EmailJS dashboard, go to **Account** → **General** → copy your **Public Key**.
+
+### 6. Pass the values to the library
+
+```java
+EmailJsConfig config = new EmailJsConfig.Builder()
+    .setServiceId("service_xxxxxxx")
+    .setPublicKey("your_public_key")
+    .setInquiryTemplateId("template_xxxxxxx")
+    .setReplyTemplateId("template_yyyyyyy")
+    // optional IMAP settings (only needed for fetchOwnerReplies)
+    .setAppEmail("your.app@gmail.com")
+    .setAppPassword("your_app_password")
+    .build();
+```
+
+---
 ##  Usage
 
 ### XML
