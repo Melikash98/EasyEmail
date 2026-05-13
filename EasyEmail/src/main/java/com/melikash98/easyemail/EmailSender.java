@@ -1,5 +1,7 @@
 package com.melikash98.easyemail;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,6 +24,7 @@ import okhttp3.Response;
 public class EmailSender {
     private static final String TAG = "EasyEmail_Sender";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     static void send(
             EmailJsConfig config,
@@ -93,7 +96,10 @@ public class EmailSender {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     Log.e(TAG, "Network failure", e);
-                    if (callback != null) callback.onError("Network error: " + e.getMessage());
+                    mainHandler.post(() -> {
+                        if (callback != null) callback.onError("Network error: " + e.getMessage());
+                    });
+
                 }
 
                 @Override
@@ -101,10 +107,14 @@ public class EmailSender {
                     String resp = response.body() != null ? response.body().string() : "";
                     Log.d(TAG, "Response [" + response.code() + "]: " + resp);
                     if (response.isSuccessful()) {
-                        if (callback != null) callback.onSuccess();
+                        mainHandler.post(() -> {
+                            if (callback != null) callback.onSuccess();
+                        });
                     } else {
-                        if (callback != null)
-                            callback.onError("EmailJS " + response.code() + ": " + resp);
+                        mainHandler.post(() -> {
+                            if (callback != null)
+                                callback.onError("EmailJS " + response.code() + ": " + resp);
+                        });
                     }
                     response.close();
                 }

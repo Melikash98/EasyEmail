@@ -1,5 +1,7 @@
 package com.melikash98.easyemail;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ import okhttp3.Response;
 public class ReplyEmailSender {
     private static final String TAG = "EasyEmail_ReplySender";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     static void send(
             EmailJsConfig config,
@@ -80,11 +83,15 @@ public class ReplyEmailSender {
                                     config, userUid, inquiryId,
                                     replyMessage, userName, userEmail, userPhotoUrl);
                         }
-                        if (callback != null) callback.onSuccess();
+                        mainHandler.post(() -> {
+                            if (callback != null) callback.onSuccess();
+                        });
                     } else {
                         Log.e(TAG, "EmailJS " + response.code() + ": " + resp);
-                        if (callback != null)
-                            callback.onError("EmailJS " + response.code() + ": " + resp);
+                        mainHandler.post(() -> {
+                            if (callback != null)
+                                callback.onError("EmailJS " + response.code() + ": " + resp);
+                        });
                     }
                     response.close();
                 }
@@ -92,7 +99,9 @@ public class ReplyEmailSender {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     Log.e(TAG, "Network failure sending reply", e);
-                    if (callback != null) callback.onError("Network error: " + e.getMessage());
+                    mainHandler.post(() -> {
+                        if (callback != null) callback.onError("Network error: " + e.getMessage());
+                    });
                 }
             });
 
